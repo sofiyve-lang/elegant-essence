@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }} - Elegant Essence{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border border-pink-100">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">👤 {{ titulo }}</h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-4">
+            {{ form.nombre.label(class="block text-gray-700 font-medium mb-2") }}
+            {{ form.nombre(class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400 focus:outline-none") }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.telefono.label(class="block text-gray-700 font-medium mb-2") }}
+            {{ form.telefono(class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400 focus:outline-none") }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.email.label(class="block text-gray-700 font-medium mb-2") }}
+            {{ form.email(class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400 focus:outline-none") }}
+        </div>
+
+        <div class="mb-6">
+            {{ form.notas_generales.label(class="block text-gray-700 font-medium mb-2") }}
+            {{ form.notas_generales(class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400 focus:outline-none", rows=3) }}
+        </div>
+
+        <div>
+            {{ form.submit(class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl transition") }}
+        </div>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('main.nueva_cita') }}" class="text-sm text-pink-600 hover:underline">Volver a agendar cita</a>
+    </div>
+</div>
+{% endblock %}

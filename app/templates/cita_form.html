@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Agendar Cita - Elegant Essence{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm border border-pink-100">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">📅 Nueva Cita</h2>
+
+    <form method="POST">
+        <!-- Selector de Cliente con el enlace rápido incorporado -->
+        <div class="mb-4">
+            <div class="flex justify-between items-center mb-2">
+                <label class="block text-gray-700 font-medium">Seleccionar Cliente</label>
+                <a href="{{ url_for('main.nuevo_cliente') }}" class="text-xs text-pink-600 hover:underline font-semibold">+ Registrar nuevo cliente</a>
+            </div>
+            <select name="id_cliente" required class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400">
+                {% for cliente in clientes %}
+                    <option value="{{ cliente.id_cliente }}">{{ cliente.nombre }} ({{ cliente.telefono or 'Sin teléfono' }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2">Estilista Asignado</label>
+            <select name="id_estilista" required class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400">
+                {% for estilista in estilistas %}
+                    <option value="{{ estilista.id_usuario }}">{{ estilista.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-4">
+    <label class="block text-gray-700 font-medium mb-2">Asistente Asignado (Opcional)</label>
+    <select name="id_asistente" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400">
+        <option value="">-- Sin asistente --</option>
+        {% for asistente in asistentes %}
+            <option value="{{ asistente.id_usuario }}">{{ asistente.username }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+        <div class="mb-6">
+            <label class="block text-gray-700 font-medium mb-2">Fecha y Hora</label>
+            <input type="datetime-local" name="fecha_hora" required class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400">
+        </div>
+
+        <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2.5 px-4 rounded-xl transition">
+            Guardar Cita
+        </button>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('main.dashboard') }}" class="text-sm text-pink-600 hover:underline">Volver al Dashboard</a>
+    </div>
+</div>
+{% endblock %}

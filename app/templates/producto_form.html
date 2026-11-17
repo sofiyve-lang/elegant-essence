@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo }} - Elegant Essence</title>
+    <!-- Aquí puedes incluir tus estilos de Tailwind o CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-pink-50 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-pink-100">
+        <h2 class="text-2xl font-bold text-pink-700 mb-6 text-center">{{ titulo }}</h2>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-4">
+                {{ form.codigo_barras.label(class="block text-gray-700 font-medium mb-2") }}
+                {{ form.codigo_barras(class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400") }}
+            </div>
+
+            <div class="mb-4">
+                {{ form.nombre.label(class="block text-gray-700 font-medium mb-2") }}
+                {{ form.nombre(class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400") }}
+            </div>
+
+            <div class="mb-4">
+                {{ form.ml_por_envase.label(class="block text-gray-700 font-medium mb-2") }}
+                {{ form.ml_por_envase(class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400") }}
+            </div>
+
+            <div class="mb-4">
+                {{ form.stock_minimo_ml.label(class="block text-gray-700 font-medium mb-2") }}
+                {{ form.stock_minimo_ml(class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400") }}
+            </div>
+
+            <div class="mb-6">
+                {{ form.precio.label(class="block text-gray-700 font-medium mb-2") }}
+                {{ form.precio(class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400") }}
+            </div>
+
+            <div>
+                {{ form.submit(class="w-full bg-pink-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-700 transition duration-200") }}
+            </div>
+        </form>
+
+        <div class="mt-4 text-center">
+            <a href="{{ url_for('inventory.lista_productos') }}" class="text-sm text-pink-600 hover:underline">Volver al inventario</a>
+        </div>
+    </div>
+</body>
+</html>

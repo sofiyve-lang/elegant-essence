@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Restock - Elegant Essence{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-pink-100">
+    <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">📦 Recepción de Mercancía (Restock)</h2>
+        <p class="text-xs text-gray-500 mt-1">Escanea con la cámara, pistola USB o escribe el código de barras.</p>
+    </div>
+
+    <form method="POST" id="form-restock">
+        {{ form.hidden_tag() }}
+        <div class="space-y-4">
+            <!-- 1. Campo de Código de Barras y Botón de Cámara -->
+            <div>
+                {{ form.codigo_barras.label(class="block text-gray-700 font-medium mb-1 text-sm") }}
+                <div class="flex gap-2">
+                    {{ form.codigo_barras(id="input-codigo", placeholder="Escanea, usa la cámara o escribe...", class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400 focus:outline-none text-sm") }}
+                    <button type="button" id="btn-camara" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-1 shadow-sm">
+                        📷 Cámara
+                    </button>
+                </div>
+                <p id="mensaje-producto" class="text-xs mt-1 text-gray-500">Usa la cámara del celular o presiona Enter al escribir.</p>
+            </div>
+
+            <!-- Contenedor oculto para la vista previa de la cámara -->
+            <div id="reader-container" class="hidden mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <div id="reader" class="w-full"></div>
+                <button type="button" id="btn-cerrar-camara" class="mt-2 w-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg transition">
+                    Cerrar Cámara
+                </button>
+            </div>
+
+            <!-- 2. Información del Producto Encontrado -->
+            <div id="info-producto" class="hidden p-4 bg-pink-50/50 rounded-xl border border-pink-100 text-xs space-y-1">
+                <p class="font-semibold text-pink-900" id="prod-nombre"></p>
+                <p class="text-gray-600" id="prod-stock"></p>
+            </div>
+
+            <!-- 3. Cantidad de Envases Recibidos -->
+            <div>
+                {{ form.envases_recibidos.label(class="block text-gray-700 font-medium mb-1 text-sm") }}
+                {{ form.envases_recibidos(placeholder="Ej. 3", class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-400 focus:outline-none text-sm") }}
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-xl transition shadow-sm text-sm">
+                Registrar Restock y Sumar Stock
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('main.dashboard') }}" class="text-xs text-pink-600 hover:underline font-medium">← Volver al Dashboard</a>
+    </div>
+</div>
+
+<!-- Librería externa HTML5 QR Code -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputCodigo = document.getElementById('input-codigo');
+    const mensajeProducto = document.getElementById('mensaje-producto');
+    const btnCamara = document.getElementById('btn-camara');
+    const readerContainer = document.getElementById('reader-container');
+    const btnCerrarCamara = document.getElementById('btn-cerrar-camara');
+    const infoProducto = document.getElementById('info-producto');
+    const prodNombre = document.getElementById('prod-nombre');
+    const prodStock = document.getElementById('prod-stock');
+
+    let html5QrCode = null;
+
+    function buscarProducto(codigo) {
+        if (!codigo) return;
+
+        fetch(`/inventario/api/buscar?codigo=${encodeURIComponent(codigo)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.encontrado) {
+                    mensajeProducto.innerHTML = `<span class="text-emerald-600 font-semibold">✔ Producto verificado correctamente</span>`;
+                    prodNombre.textContent = `📦 Producto: ${data.nombre}`;
+                    prodStock.textContent = `ml por envase: ${data.ml_por_envase} ml | Stock actual: ${data.stock_total_ml} ml`;
+                    infoProducto.classList.remove('hidden');
+                } else {
+                    mensajeProducto.innerHTML = `<span class="text-rose-600 font-semibold">✖ ${data.mensaje}</span>`;
+                    infoProducto.classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error al buscar el producto:', error);
+            });
+    }
+
+    inputCodigo.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarProducto(inputCodigo.value.trim());
+        }
+    });
+
+    btnCamara.addEventListener('click', function() {
+        readerContainer.classList.remove('hidden');
+
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("reader");
+        }
+
+        const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+        html5QrCode.start(
+            { facingMode: "environment" },
+            config,
+            (decodedText, decodedResult) => {
+                inputCodigo.value = decodedText;
+                buscarProducto(decodedText);
+
+                html5QrCode.stop().then(() => {
+                    readerContainer.classList.add('hidden');
+                }).catch(err => console.error("Error al detener cámara", err));
+            },
+            (errorMessage) => {}
+        ).catch(err => {
+            alert("No se pudo acceder a la cámara. Asegúrate de habilitar los permisos en las opciones avanzadas de tu navegador.");
+            readerContainer.classList.add('hidden');
+        });
+    });
+
+    btnCerrarCamara.addEventListener('click', function() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                readerContainer.classList.add('hidden');
+            }).catch(err => console.log(err));
+        } else {
+            readerContainer.classList.add('hidden');
+        }
+    });
+});
+</script>
+{% endblock %}
